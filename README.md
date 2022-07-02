@@ -7,3 +7,6 @@ To run the script, you need to put the images that will be used in the mosaic in
 # System requirements:
 RAM: >8 GB;
 CPU: >2.4 GHz x2
+# Optional:
+You can download mosaic images from Google Drive:
+https://drive.google.com/file/d/1X0H_NUeQQWjRlnnOgA0n1skQ0F8hHNwx/view?usp=sharing
