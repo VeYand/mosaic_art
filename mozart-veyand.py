@@ -203,18 +203,10 @@ def many2one(quality=1, rows=100, cols=100, file='', frequency=(100, 300), max_i
     except Exception as ex: print(f'\n{ex}')
 
 
-def main():
+def main(USE_RAM=1, rows = 100, cols = 100, frequency = (200, 500), max_image_count = 1000):
     tprint('MozArt - VeYand', font='tarty1')
     print('Upload the input images to the "/enter" folder (press Enter to continue)')
     input()
-
-    #Parametrs
-    USE_RAM = 4.5 #(GB)
-    rows = 250
-    cols = 250
-    frequency = (1000, 5000)#the minimum and maximum number of substitutions that do not have the same image
-    max_image_count = 10000# maximum number of images used
-
 
     images = glob.glob('enter/*.jpg') + glob.glob('enter/*.jpeg') + glob.glob('enter/*.png')
     quality = USE_RAM/1.1*1024*1024*1024*8/24
@@ -232,4 +224,10 @@ def main():
         print()
 
 if __name__ == '__main__':
-    main()
+    #Parametrs
+    USE_RAM = 4.5 #(GB)
+    rows = 250
+    cols = 250
+    frequency = (1000, 5000)#the minimum and maximum number of substitutions that do not have the same image
+    max_image_count = 10000# maximum number of images used
+    main(USE_RAM=USE_RAM, rows=rows, cols=cols, frequency=frequency, max_image_count=max_image_count)
