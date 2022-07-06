@@ -88,7 +88,7 @@ def avarage_dir(file_path = '.output'):
     old_print=-1
     for item in items:
         try:
-            input_images[item] = [avarage(f'{file_path}\\{item}'), 0]
+            input_images[item] = [avarage(f'{file_path}/{item}'), 0]
             count+=1
             if int(count / total * 100) != old_print:
                 sprint(f'\r[INFO] Reading source images... {int(count / total * 100)} % ', end='')
