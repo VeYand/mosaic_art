@@ -147,7 +147,12 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
 
             offset_x=int(x_goast)
     sprint(f'\r[INFO] Gluing an image... 100 % ', end='')
-    mask_im.save(f'result.jpg')
+    if any([i>65000 for i in mask_im.size]):
+        mask_im.save('result.png')
+        return '.png'
+    else:
+        mask_im.save('result.jpg')
+        return '.jpg'
 
 def clear():
     clear_list = ['.output']
@@ -183,10 +188,11 @@ def many2one(quality=1, rows=100, cols=100, file='', frequency=(100, 300), max_i
         time_3 = time.time()
         sprint(f'[{int(time_3 - time_2)} s.]')
         sprint('[INFO] Gluing an image...', end='')
-        gluing(file=file, cols=cols, rows=rows, new_x = x, new_y = y, input_images=input_images, frequency=frequency)
+        file_format = gluing(file=file, cols=cols, rows=rows, new_x = x, new_y = y, input_images=input_images, frequency=frequency)
         time_4 = time.time()
         sprint(f'[{int(time_4-time_3)} s.]')
         sprint(f'\r[INFO] Image creation completed successfully in {int(time_4-start_time)} seconds!')
+        return file_format
     except Exception as ex: print(f'\n{ex}')
 
 
@@ -207,13 +213,13 @@ def main():
     quality = USE_RAM/1.1*1024*1024*1024*8/24
     for image in images:
         sprint(f'{image} in processing...')
-        many2one(quality=quality, rows=rows, cols=cols, file=image, frequency=frequency, max_image_count=max_image_count)
+        file_format = many2one(quality=quality, rows=rows, cols=cols, file=image, frequency=frequency, max_image_count=max_image_count)
         i = 0
         while os.path.isdir(f'result/result_{i}'):
             i+=1
         os.mkdir(f'result/result_{i}')
         shutil.move(image, f'result/result_{i}/original.{image.split(".")[-1]}')
-        shutil.move('result.jpg', f'result/result_{i}/result.jpg')
+        shutil.move(f'result{file_format}', f'result/result_{i}/result{file_format}')
         sprint('[INFO] Clearing... ')
         clear()
         print()
