@@ -136,7 +136,7 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
             color_cur = pixels[x, y]
             try:
                 input_images, file = comparsion(input_images, color_cur, frequency)
-                file = f'.output\\{file}'
+                file = f'.output/{file}'
                 im = Image.open(file)
                 mask_im.paste(im, (offset_x, offset_y))
                 im.close()
@@ -174,9 +174,16 @@ def many2one(quality=1, rows=100, cols=100, file='', frequency=(100, 300), max_i
         img = Image.open(file)
         x, y = img.size
 
+        flag = True
         while x*y<quality:
+            if (x>65000 or y>65000) and flag:
+                com = input("\rWith your current settings, a PNG image will be created. The file size can be very large and the file simply won't be able to open. Put a pixel limit to get a JPG file? (Y/N): ")
+                if com.lower() in ['y', 'yes']:
+                    break
+                else:
+                    flag = False
             x, y = x*1.01, y*1.01
-        x, y = int(x), int(y)
+        x, y = int(x/1.01), int(y/1.01)
 
         start_time = time.time()
         sprint(f'\r[INFO] Preparing source images... ', end='')
