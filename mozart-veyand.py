@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+import sys
 import os
 import random
 import shutil
@@ -22,12 +23,17 @@ import glob
 from art import tprint
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
+def sprint(text, end='\n'):
+    sys.stdout.write(f'{text}{end}')
 def resize(cols=100, rows=100, img_weight=100, img_height=100, max_image_count=5000):
     cur_x, cur_y = int(img_weight/cols), int(img_height/rows)
     files = os.listdir('input')
     random.shuffle(files)
     if len(files)>max_image_count:
         files = files[:max_image_count]
+    count = 0
+    total = len(files)
+    old_print = -1
     for file in files:
         img = Image.open(f'input/{file}')
         x, y = img.size
@@ -45,6 +51,12 @@ def resize(cols=100, rows=100, img_weight=100, img_height=100, max_image_count=5
         ))
         new_image = new_image.resize((cur_x, cur_y))
         new_image.save(f'.output/{file}')
+        count+=1
+        if int(count/total*100)!=old_print:
+            sprint(f'\r[INFO] Preparing source images... {int(count/total*100)} % ', end='')
+            old_print = int(count/total*100)
+    sprint(f'\r[INFO] Preparing source images... 100 % ', end='')
+
 
 
 def avarage(picture_name):
@@ -70,9 +82,19 @@ def avarage(picture_name):
 
 def avarage_dir(file_path = '.output'):
     input_images = {}
-    for item in os.listdir(file_path):
-        try: input_images[item] = [avarage(f'{file_path}\\{item}'), 0]
+    items = os.listdir(file_path)
+    count = 0
+    total = len(items)
+    old_print=-1
+    for item in items:
+        try:
+            input_images[item] = [avarage(f'{file_path}\\{item}'), 0]
+            count+=1
+            if int(count / total * 100) != old_print:
+                sprint(f'\r[INFO] Reading source images... {int(count / total * 100)} % ', end='')
+                old_print = int(count / total * 100)
         except Exception as ex: pass
+    sprint(f'\r[INFO] Reading source images... 100 % ', end='')
     return input_images
 def comparsion(input_images, current_color, frequency):
     comp = {}
@@ -95,7 +117,7 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
     img = img.resize((cols, rows))
     pixels = img.load()
 
-    mask_im = Image.new('RGB', (new_x, new_y), 'white')
+    mask_im = Image.new('RGB', (new_x-cols, new_y-rows), 'white')
 
     offset_x_glob = new_x / cols
     offset_y_glob = new_y / rows
@@ -108,7 +130,7 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
         x_goast = 0
         offset_x = 0
         if int(y/cols*100)!=old_print:
-            print(f'\r[INFO] Gluing an image... {int(y/cols*100)} % ', end='')
+            sprint(f'\r[INFO] Gluing an image... {int(y/cols*100)} % ', end='')
             old_print = int(y/cols)
         for x in range(0, cols):
             color_cur = pixels[x, y]
@@ -117,14 +139,14 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
                 file = f'.output\\{file}'
                 im = Image.open(file)
                 mask_im.paste(im, (offset_x, offset_y))
+                im.close()
             except Exception: pass
 
             x_goast+=offset_x_glob
             x_goast-=1
 
             offset_x=int(x_goast)
-    mask_im = mask_im.crop((0, 0, new_x-cols, new_y-rows))
-    print(f'\r[INFO] Gluing an image... 100 % ', end='')
+    sprint(f'\r[INFO] Gluing an image... 100 % ', end='')
     mask_im.save(f'result.jpg')
 
 def clear():
@@ -140,7 +162,7 @@ def clear():
 
 def many2one(quality=1, rows=100, cols=100, file='', frequency=(100, 300), max_image_count=5000):
     try:
-        print('[INFO] Clearing...', end='')
+        sprint('[INFO] Clearing...', end='')
         clear()
         for dir in ['enter', 'input', '.output', 'result']:
             if not os.path.isdir(dir): os.mkdir(dir)
@@ -152,19 +174,19 @@ def many2one(quality=1, rows=100, cols=100, file='', frequency=(100, 300), max_i
         x, y = int(x), int(y)
 
         start_time = time.time()
-        print(f'\r[INFO] Preparing source images... ', end='')
+        sprint(f'\r[INFO] Preparing source images... ', end='')
         resize(cols=cols, rows=rows, img_weight=x, img_height=y, max_image_count=max_image_count)
         time_2 = time.time()
-        print(f'[{int(time_2 - start_time)} s.]')
-        print('[INFO] Reading source images... ', end='')
+        sprint(f'[{int(time_2 - start_time)} s.]')
+        sprint('[INFO] Reading source images... ', end='')
         input_images = avarage_dir()
         time_3 = time.time()
-        print(f'[{int(time_3 - time_2)} s.]')
-        print('[INFO] Gluing an image...', end='')
+        sprint(f'[{int(time_3 - time_2)} s.]')
+        sprint('[INFO] Gluing an image...', end='')
         gluing(file=file, cols=cols, rows=rows, new_x = x, new_y = y, input_images=input_images, frequency=frequency)
         time_4 = time.time()
-        print(f'[{int(time_4-time_3)} s.]')
-        print(f'\r[INFO] Image creation completed successfully in {int(time_4-start_time)} seconds!')
+        sprint(f'[{int(time_4-time_3)} s.]')
+        sprint(f'\r[INFO] Image creation completed successfully in {int(time_4-start_time)} seconds!')
     except Exception as ex: print(f'\n{ex}')
 
 
@@ -174,15 +196,17 @@ def main():
     input()
 
     #Parametrs
-    quality = 20000*20000 #(widght*height)
-    rows = 100
-    cols = 100
-    frequency = (1000, 3000)#the minimum and maximum number of substitutions that do not have the same image
+    USE_RAM = 4.5 #(GB)
+    rows = 250
+    cols = 250
+    frequency = (1000, 5000)#the minimum and maximum number of substitutions that do not have the same image
     max_image_count = 10000# maximum number of images used
 
+
     images = glob.glob('enter/*.jpg') + glob.glob('enter/*.jpeg') + glob.glob('enter/*.png')
+    quality = USE_RAM/1.1*1024*1024*1024*8/24
     for image in images:
-        print(f'{image} in processing...')
+        sprint(f'{image} in processing...')
         many2one(quality=quality, rows=rows, cols=cols, file=image, frequency=frequency, max_image_count=max_image_count)
         i = 0
         while os.path.isdir(f'result/result_{i}'):
@@ -190,7 +214,7 @@ def main():
         os.mkdir(f'result/result_{i}')
         shutil.move(image, f'result/result_{i}/original.{image.split(".")[-1]}')
         shutil.move('result.jpg', f'result/result_{i}/result.jpg')
-        print('[INFO] Clearing... ')
+        sprint('[INFO] Clearing... ')
         clear()
         print()
 
