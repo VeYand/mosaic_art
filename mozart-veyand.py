@@ -147,7 +147,7 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
 
             offset_x=int(x_goast)
     sprint(f'\r[INFO] Gluing an image... 100 % ', end='')
-    if any([i>65000 for i in mask_im.size]):
+    if any([i>65500 for i in mask_im.size]):
         mask_im.save('result.png')
         return '.png'
     else:
