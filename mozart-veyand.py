@@ -130,7 +130,7 @@ def gluing(file='', cols=100, rows=100, new_x = 100, new_y = 100, input_images={
         x_goast = 0
         offset_x = 0
         if int(y/cols*100)!=old_print:
-            sprint(f'\r[INFO] Gluing an image... {int(y/cols*100)} % ', end='')
+            sprint(f'\r[INFO] Gluing an image... {int(y/rows*100)} % ', end='')
             old_print = int(y/cols)
         for x in range(0, cols):
             color_cur = pixels[x, y]
