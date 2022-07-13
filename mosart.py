@@ -204,7 +204,7 @@ def many2one(quality=1, rows=100, cols=100, file='', frequency=(100, 300), max_i
 
 
 def main(USE_RAM=1, rows = 100, cols = 100, frequency = (200, 500), max_image_count = 1000):
-    tprint('MozArt - VeYand', font='tarty1')
+    tprint('MosArt - VeYand', font='tarty1')
     print('Upload the input images to the "/enter" folder (press Enter to continue)')
     input()
 
